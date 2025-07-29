@@ -1,0 +1,36 @@
+{
+  "name": "clip-admin-front",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/xlsx": "^0.0.35",
+    "axios": "^1.6.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
+    "lucide-react": "^0.525.0",
+    "next": "^13.4.19",
+    "react": "^18.2.0",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.18.8",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.7",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.2.2"
+  }
+}
