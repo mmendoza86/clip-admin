@@ -1,16 +1,16 @@
 import api from './api';
 
-export const getTransacciones = (
+export const getConciliacion = (
   from: Date | null,
   to: Date | null,
-  clienteId: number | string
 ) => {
   const formatDate = (date: Date | null) =>
     date ? date.toISOString().slice(0, 10) : null;
 
-  return api.post('/clip/payments', {
-    from: formatDate(from),
-    to: formatDate(to),
-    clienteId
+  return api.get('/conciliation', {
+    params: {
+      fechaInicio: formatDate(from),
+      fechaFin: formatDate(to),
+    },
   });
 };

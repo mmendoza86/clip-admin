@@ -5,13 +5,14 @@ import {
   updateCliente,
   deleteCliente
 } from '../services/clienteService';
-import { set } from 'date-fns';
 import { Delete, DeleteIcon, Edit, Trash, Trash2 } from 'lucide-react';
+import { useToast } from './ui/use-toast';
+import ModalConfirm from './utils/ModalConfirm';
 
 interface Cliente {
   id: number;
   nombre: string;
-  numero: string;
+  numeroCte: string;
   correo: string;
   password: string;
   apiKey: string;
@@ -19,10 +20,13 @@ interface Cliente {
 }
 
 export default function ClientesSection() {
+  const { showToast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [nuevo, setNuevo] = useState<Omit<Cliente, 'id'>>({
     nombre: '',
-    numero: '',
+    numeroCte: '',
     correo: '',
     password: '',
     apiKey: '',
@@ -30,6 +34,15 @@ export default function ClientesSection() {
   });
   const [modoEditar, setModoEditar] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // Estado para mostrar el modal
+  const [clienteToDelete, setClienteToDelete] = useState<number | null>(null); // Cliente a eliminar
+
+  const totalPages = Math.ceil(clientes.length / itemsPerPage);
+  const paginatedClientes = clientes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
 
   const cargarClientes = async () => {
     setLoading(true);
@@ -48,6 +61,28 @@ export default function ClientesSection() {
   }, []);
 
   const guardarCliente = async () => {
+    if (!modoEditar 
+      && (!nuevo.nombre || !nuevo.numeroCte || !nuevo.correo || !nuevo.password || !nuevo.apiKey || !nuevo.claveSecreta)) {
+      showToast({
+        title: 'Error al guardar',
+        description: 'Por favor completa todos los campos.'
+      });
+      return;
+    } else if (modoEditar && (!nuevo.nombre || !nuevo.numeroCte || !nuevo.correo)) {
+      showToast({
+        title: 'Error al guardar',
+        description: 'Por favor completa el nombre del cliente.'
+      });
+      return;
+    }
+    if (!nuevo.correo.includes('@')) {
+      showToast({
+        title: 'Error al guardar',
+        description: 'El correo electrónico no es válido.'
+      });
+      return;
+    }
+    
     try {
       if (modoEditar !== null) {
         await updateCliente(modoEditar, nuevo);
@@ -57,33 +92,47 @@ export default function ClientesSection() {
 
       setNuevo({
         nombre: '',
-        numero: '',
+        numeroCte: '',
         correo: '',
         password: '',
         apiKey: '',
         claveSecreta: ''
       });
       setModoEditar(null);
+      showToast({
+        title: 'Éxito',
+        description: 'Cliente guardado correctamente.'
+      });
       cargarClientes();
     } catch (err) {
-      alert('Error al guardar cliente');
+      showToast({
+        title: 'Error',
+        description: 'No se pudo guardar el cliente.'
+      });
     }
   };
 
   const eliminar = async (id: number) => {
-    if (!confirm('¿Eliminar cliente?')) return;
     try {
       await deleteCliente(id);
+      showToast({
+        title: 'Éxito',
+        description: 'Cliente eliminado correctamente.'
+      });
       cargarClientes();
+      setShowDeleteModal(false); // Cerrar el modal después de eliminar
     } catch {
-      alert('Error al eliminar');
+      showToast({
+        title: 'Error',
+        description: 'No se pudo eliminar el cliente.'
+      });
     }
   };
 
   const editar = (c: Cliente) => {
     setNuevo({
       nombre: c.nombre,
-      numero: c.numero,
+      numeroCte: c.numeroCte,
       correo: c.correo,
       password: c.password,
       apiKey: c.apiKey,
@@ -92,20 +141,55 @@ export default function ClientesSection() {
     setModoEditar(c.id);
   };
 
+  const abrirModalEliminar = (id: number) => {
+    setClienteToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const cerrarModalEliminar = () => {
+    setShowDeleteModal(false);
+    setClienteToDelete(null);
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Gestión de Clientes</h2>
 
+       <ModalConfirm
+        isOpen={showDeleteModal}
+        title="¿Estás seguro de eliminar este cliente?"
+        message="Esta acción no se puede deshacer."
+        onConfirm={() => {
+          if (clienteToDelete !== null) eliminar(clienteToDelete);
+        }}
+        onCancel={cerrarModalEliminar}
+      />
+
       <div className="grid grid-cols-3 gap-4 mb-4">
         <input className="border px-2 py-1" placeholder="Nombre" value={nuevo.nombre} onChange={e => setNuevo({ ...nuevo, nombre: e.target.value })} />
-        <input className="border px-2 py-1" placeholder="No. Cliente" value={nuevo.numero} onChange={e => setNuevo({ ...nuevo, numero: e.target.value })} />
+        <input className="border px-2 py-1" placeholder="No. Cliente" value={nuevo.numeroCte} onChange={e => setNuevo({ ...nuevo, numeroCte: e.target.value })} />
         <input className="border px-2 py-1" placeholder="Correo" value={nuevo.correo} onChange={e => setNuevo({ ...nuevo, correo: e.target.value })} />
         <input className="border px-2 py-1" placeholder="Password" value={nuevo.password} onChange={e => setNuevo({ ...nuevo, password: e.target.value })} />
         <input className="border px-2 py-1" placeholder="API Key" value={nuevo.apiKey} onChange={e => setNuevo({ ...nuevo, apiKey: e.target.value })} />
         <input className="border px-2 py-1" placeholder="Clave Secreta" value={nuevo.claveSecreta} onChange={e => setNuevo({ ...nuevo, claveSecreta: e.target.value })} />
-        <button onClick={guardarCliente} className="col-span-3 bg-primary-700 text-white py-2 rounded hover:bg-primary-600">
-          {modoEditar ? "Actualizar Cliente" : "Agregar Cliente"}
-        </button>
+
+        <div className={`col-span-3 ${modoEditar ? "flex gap-2" : ""}`}>
+          <button
+            onClick={guardarCliente}
+            className={`${modoEditar ? "w-full" : "w-full col-span-3"} bg-primary-700 text-white py-2 rounded hover:bg-primary-600`}
+          >
+            {modoEditar ? "Actualizar Cliente" : "Agregar Cliente"}
+          </button>
+
+          {modoEditar && (
+            <button
+              onClick={() => setModoEditar(null)}
+              className="w-full bg-secondary-300 text-gray-700 py-2 rounded hover:bg-secondary-200"
+            >
+              Cancelar Edición
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -124,19 +208,19 @@ export default function ClientesSection() {
             </tr>
           </thead>
           <tbody>
-            {clientes.map(c => (
+            {paginatedClientes.map(c => (
               <tr key={c.id} className="border-t">
                 <td className="p-2">{c.nombre}</td>
-                <td className="p-2">{c.numero}</td>
+                <td className="p-2">{c.numeroCte}</td>
                 <td className="p-2">{c.correo}</td>
-                <td className="p-2"><input type="password" readOnly value={c.password} className="bg-transparent" /></td>
-                <td className="p-2"><input type="password" readOnly value={c.apiKey} className="bg-transparent" /></td>
-                <td className="p-2"><input type="password" readOnly value={c.claveSecreta} className="bg-transparent" /></td>
+                <td className="p-2"><input type="password" readOnly value={"123123"} className="bg-transparent" /></td>
+                <td className="p-2"><input type="password" readOnly value={"123123"} className="bg-transparent" /></td>
+                <td className="p-2"><input type="password" readOnly value={"123123"} className="bg-transparent" /></td>
                 <td className="p-2 space-x-2">
                   <button onClick={() => editar(c)} className="text-blue-600 hover:underline">
-                     <Edit className="inline w-4 h-4" />
+                    <Edit className="inline w-4 h-4" />
                   </button>
-                  <button onClick={() => eliminar(c.id)} className="text-red-600 hover:underline">
+                  <button onClick={() => abrirModalEliminar(c.id)} className="text-red-600 hover:underline">
                     <Trash2 className="inline w-4 h-4" />
                   </button>
                 </td>
@@ -148,7 +232,29 @@ export default function ClientesSection() {
               </td>
             </tr>
           </tbody>
-        </table>
+        </table>        
+      )}
+
+      {clientes.length > itemsPerPage && (
+        <div className="mt-4 flex justify-center items-center gap-4">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-secondary-300 text-sm rounded hover:bg-secondary-400 disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <span className="text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 bg-secondary-300 text-sm rounded hover:bg-secondary-400 disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
       )}
     </div>
   );

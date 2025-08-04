@@ -5,6 +5,8 @@ import DepositosSection from '../components/DepositosSection';
 import PagosSection from '../components/PagosSection';
 import Sidebar from '../components/layout/sidebar';
 import ContentWrapper from '../components/layout/ContentWrapper';
+import HistorialSection from '../components/reportes/HistorialReportes';
+import ConciliacionSection from '@/components/ConciliacionSection';
 
 
 const Dashboard = () => {
@@ -17,8 +19,12 @@ const Dashboard = () => {
         return <ClientesSection />;
       case 'depositos':
         return <DepositosSection />;
-      case 'pagos':
+      case 'transacciones':
         return <PagosSection />;
+      case 'historial':
+        return <HistorialSection />;
+      case 'conciliaciones':
+        return <ConciliacionSection />
       default:
         return "Agregar componente para la sección " + selectedSection;
     }

@@ -12,7 +12,8 @@ import {
   ChevronRight as ArrowRight,
   FolderOpen,
   FolderClosed,
-  History
+  History,
+  Database
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
@@ -22,6 +23,7 @@ const icons = {
   fileText: <FileText className="w-4 h-4" />,
   download: <Download className="w-4 h-4" />,
   dollarSign: <DollarSign className="w-4 h-4" />,
+  conciliation: <Database className="w-4 h-4" />,
   history: <History className="w-4 h-4" />
 };
 
@@ -113,37 +115,43 @@ export default function Sidebar({
     });
 
   return (
-    <div
-      className={clsx(
-        "bg-primary-600 text-white p-6 flex flex-col justify-between min-h-screen transition-all duration-300",
-        collapsed ? "w-20" : "w-64"
-      )}
-    >
-      <div>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="mb-4 text-white hover:text-gray-300"
-        >
-          {/* buscar un icono que sea como una ventana */}
-          {collapsed ? <FolderOpen className="w-5 h-5" /> : <FolderClosed className="w-5 h-5" />}
-        </button>
-        {!collapsed && <h1 className="text-2xl font-bold mb-6">{title}</h1>}
-        {renderItems(navItems)}
-      </div>
-
-      <div className="mt-6 border-t border-white/10 pt-4">
-        <button
-          onClick={handleLogout}
-           className={clsx(
-              "w-full text-left py-2 rounded flex items-center transition-colors",
-              collapsed ? "justify-center px-2" : "gap-2 px-4",
-              "bg-secondary-500 hover:bg-secondary-600"
-            )}
-        >
-          <LogOut className="w-4 h-4" />
-          {!collapsed && 'Salir'}
-        </button>
-      </div>
+  <div
+    className={clsx(
+      "bg-primary-600 text-white p-6 flex flex-col h-screen transition-all duration-300",
+      collapsed ? "w-20" : "w-72"
+    )}
+  >
+    {/* Parte superior: encabezado y botón de colapso */}
+    <div className="mb-4">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="mb-4 text-white hover:text-gray-300"
+      >
+        {collapsed ? <FolderOpen className="w-5 h-5" /> : <FolderClosed className="w-5 h-5" />}
+      </button>
+      {!collapsed && <h1 className="text-2xl font-bold mb-6">{title}</h1>}
     </div>
-  );
+
+    {/* Contenido scrollable */}
+    <div className="flex-1 overflow-y-auto">
+      {renderItems(navItems)}
+    </div>
+
+    {/* Botón salir fijo abajo */}
+    <div className="border-t border-white/10 pt-4 mt-4">
+      <button
+        onClick={handleLogout}
+        className={clsx(
+          "w-full text-left py-2 rounded flex items-center transition-colors",
+          collapsed ? "justify-center px-2" : "gap-2 px-4",
+          "bg-secondary-500 hover:bg-secondary-600"
+        )}
+      >
+        <LogOut className="w-4 h-4" />
+        {!collapsed && 'Salir'}
+      </button>
+    </div>
+  </div>
+);
+
 }

@@ -17,7 +17,7 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
-    title: 'Reportes',
+    title: 'Reportes CLIP',
     url: '',
     icon: 'fileText',
     role: ['admin'],
@@ -29,18 +29,24 @@ export const navItems: NavItem[] = [
         role: ['admin']
       },
       {
-        title: 'Pagos',
-        url: '/dashboard/pagos',
+        title: 'Transacciones',
+        url: '/dashboard/transacciones',
         icon: 'dollarSign',
         role: ['admin']
       }
     ]
   },
-   {
+  {
+    title: 'Conciliaciones',
+    url: '/dashboard/conciliaciones',
+    icon: 'conciliation',
+    role: ['admin']
+  },
+  {
     title: 'Historial',
     url: '/dashboard/historial',
     icon: 'history',
     role: ['admin'],
     items: []
-  },
+  }
 ];
