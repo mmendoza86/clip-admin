@@ -1,25 +1,36 @@
-// server.js
-const { createServer } = require('https');
-const { parse } = require('url');
+const express = require('express');
 const next = require('next');
-const fs = require('fs');
 const path = require('path');
+const errorHandlers = require('./middlewares/errorHandlers');
+const reportesRoutes = require('./routes/reportes');
 
-const dev = process.env.NODE_ENV !== 'production';
+const dev = false;
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, 'certs/key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'certs/cert.pem'))
-};
-
 app.prepare().then(() => {
-  createServer(httpsOptions, (req, res) => {
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
-  }).listen(3001, err => {
-    if (err) throw err;
-    console.log('> Servidor HTTPS corriendo en https://localhost:3001');
+  const server = express();
+  // Permitir payloads grandes (JSON y URL-encoded)
+  server.use(express.json({ limit: '10mb' }));
+  server.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+
+  console.log("✅ Next.js preparado, iniciando Express...");
+
+  // Errores globales
+  errorHandlers(server);
+
+  // Rutas de reportes
+  server.use('/', reportesRoutes);
+
+  // Rutas Next.js (solo GET que no sean API ni reportes)
+  server.get(/^\/(?!api|reportes).*/, (req, res) => {
+    return handle(req, res);
+  });
+
+  const port = process.env.PORT || 3000;
+  console.log("📡 Iniciando servidor Express...");
+  server.listen(port, () => {
+    console.log(`🚀 Servidor listo en http://localhost:${port}`);
   });
 });

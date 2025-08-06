@@ -93,7 +93,7 @@ export default function ReporteSeccion({ seccion, fetchData }: ReporteSeccionPro
         return;
       }
 
-      await axios.post('/api/reportes/generar', {
+      const response = await axios.post('/api/reportes/generar', {
         data: exportData,
         clienteId,
         startDate,
