@@ -1,13 +1,14 @@
+// routes/reportes.js
 const express = require('express');
-const path = require('path');
 const fs = require('fs');
 const { writeFile, readdir } = require('fs').promises;
+const path = require('path');
 const XLSX = require('xlsx');
+const { REPORTES_DIR, MAX_REPORTES } = require('../config/constants');
 
 const router = express.Router();
-const REPORTES_DIR = path.join(__dirname, '../public', 'reportes');
 
-// Servir reportes estáticos
+// Servir archivos estáticos de reportes
 router.use('/reportes', express.static(REPORTES_DIR));
 
 // API: Generar reporte
@@ -19,12 +20,13 @@ router.post('/api/reportes/generar', async (req, res) => {
 
   try {
     const reportsDir = path.join(REPORTES_DIR, seccion);
+
     if (!fs.existsSync(reportsDir)) {
       fs.mkdirSync(reportsDir, { recursive: true });
     }
 
     const files = fs.readdirSync(reportsDir).filter(f => f.endsWith('.xlsx'));
-    if (files.length >= 5) {
+    if (files.length >= MAX_REPORTES) {
       const oldest = files
         .map(name => ({
           name,
@@ -44,6 +46,7 @@ router.post('/api/reportes/generar', async (req, res) => {
     const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
     await writeFile(filepath, buffer);
 
+    console.log(`✅ Reporte generado: ${filepath}`);
     res.status(200).json({ message: 'Reporte generado', filename });
   } catch (error) {
     console.error('❌ Error al generar reporte:', error);
@@ -65,7 +68,7 @@ router.get('/api/reportes/historial', async (req, res) => {
     const sorted = files
       .filter(f => f.endsWith('.xlsx'))
       .sort((a, b) => b.localeCompare(a))
-      .slice(0, 5);
+      .slice(0, MAX_REPORTES);
 
     res.status(200).json({ files: sorted });
   } catch (error) {

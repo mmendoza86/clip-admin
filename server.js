@@ -1,6 +1,8 @@
-const express = require('express');
 const next = require('next');
-const path = require('path');
+const express = require('express');
+const { SERVER_PORT } = require('./config/constants');
+const configureExpress = require('./config/express');
+const logger = require('./config/logger');
 const errorHandlers = require('./middlewares/errorHandlers');
 const reportesRoutes = require('./routes/reportes');
 
@@ -10,27 +12,25 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const server = express();
-  // Permitir payloads grandes (JSON y URL-encoded)
-  server.use(express.json({ limit: '10mb' }));
-  server.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+  // Configuración de Express
+  configureExpress(server);
 
-  console.log("✅ Next.js preparado, iniciando Express...");
+  // Manejo de errores globales
+  errorHandlers();
 
-  // Errores globales
-  errorHandlers(server);
+  logger.info('✅ Next.js preparado, iniciando Express...');
 
-  // Rutas de reportes
+  // Rutas API
   server.use('/', reportesRoutes);
 
-  // Rutas Next.js (solo GET que no sean API ni reportes)
+  // Rutas de Next.js (GET que no sean API ni reportes)
   server.get(/^\/(?!api|reportes).*/, (req, res) => {
     return handle(req, res);
   });
 
-  const port = process.env.PORT || 3000;
-  console.log("📡 Iniciando servidor Express...");
-  server.listen(port, () => {
-    console.log(`🚀 Servidor listo en http://localhost:${port}`);
+  // Iniciar servidor
+  server.listen(SERVER_PORT, () => {
+    logger.info(`🚀 Servidor listo en http://localhost:${SERVER_PORT}`);
   });
 });
