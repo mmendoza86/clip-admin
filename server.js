@@ -6,7 +6,8 @@ const logger = require('./config/logger');
 const errorHandlers = require('./middlewares/errorHandlers');
 const reportesRoutes = require('./routes/reportes');
 
-const dev = false;
+const dev = process.env.NODE_ENV !== 'production';
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 

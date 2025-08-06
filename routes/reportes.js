@@ -5,6 +5,7 @@ const { writeFile, readdir } = require('fs').promises;
 const path = require('path');
 const XLSX = require('xlsx');
 const { REPORTES_DIR, MAX_REPORTES } = require('../config/constants');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
@@ -46,7 +47,7 @@ router.post('/api/reportes/generar', async (req, res) => {
     const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
     await writeFile(filepath, buffer);
 
-    console.log(`✅ Reporte generado: ${filepath}`);
+    logger.info(`✅ Reporte generado: ${filename} en ${reportsDir}`);
     res.status(200).json({ message: 'Reporte generado', filename });
   } catch (error) {
     console.error('❌ Error al generar reporte:', error);
