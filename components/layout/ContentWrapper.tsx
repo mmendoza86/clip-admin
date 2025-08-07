@@ -27,6 +27,7 @@ export default function ContentWrapper({ children, title }: Props) {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('token_expiration');
     router.push('/');
   };
 

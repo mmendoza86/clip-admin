@@ -8,8 +8,6 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
-  ChevronLeft,
-  ChevronRight as ArrowRight,
   FolderOpen,
   FolderClosed,
   History,
@@ -30,11 +28,15 @@ const icons = {
 export default function Sidebar({
   onNavigate,
   selectedSection,
-  title
+  title,
+  isMobileOpen = false,
+  onClose = () => {}
 }: {
   onNavigate: (section: string) => void;
   selectedSection: string;
   title?: string;
+  isMobileOpen?: boolean;
+  onClose?: () => void;
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
@@ -59,7 +61,7 @@ export default function Sidebar({
   };
 
   const normalize = (str: string) =>
-    str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   const renderItems = (items: NavItem[]) =>
     items.map((item, index) => {
@@ -70,13 +72,19 @@ export default function Sidebar({
       return (
         <div key={item.title} className="mb-1">
           <button
-            onClick={() => item.items?.length ? handleToggle(item.title) : onNavigate(item.url)}
+            onClick={() => {
+              if (item.items?.length) {
+                handleToggle(item.title);
+              } else {
+                onNavigate(item.url);
+                onClose();
+              }
+            }}
             className={clsx(
-              "w-full text-left px-2 py-2 flex items-center rounded transition-colors",
+              "w-full text-left py-2 flex items-center rounded transition-colors",
               collapsed ? "justify-center" : "justify-between gap-2 px-4",
               isParentActive ? "bg-primary-700" : "hover:bg-secondary-400"
             )}
-
           >
             <div className="flex items-center gap-2">
               {icons[item.icon as keyof typeof icons]}
@@ -94,7 +102,10 @@ export default function Sidebar({
                 return (
                   <button
                     key={sub.title}
-                    onClick={() => onNavigate(sub.url)}
+                    onClick={() => {
+                      onNavigate(sub.url);
+                      onClose();
+                    }}
                     className={clsx(
                       "block w-full text-left py-2 flex items-center rounded transition-colors",
                       collapsed ? "justify-center px-2" : "gap-2 px-4",
@@ -115,43 +126,50 @@ export default function Sidebar({
     });
 
   return (
-  <div
-    className={clsx(
-      "bg-primary-600 text-white p-6 flex flex-col h-screen transition-all duration-300",
-      collapsed ? "w-20" : "w-72"
-    )}
-  >
-    {/* Parte superior: encabezado y botón de colapso */}
-    <div className="mb-4">
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="mb-4 text-white hover:text-gray-300"
-      >
-        {collapsed ? <FolderOpen className="w-5 h-5" /> : <FolderClosed className="w-5 h-5" />}
-      </button>
-      {!collapsed && <h1 className="text-2xl font-bold mb-6">{title}</h1>}
-    </div>
+    <>
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
 
-    {/* Contenido scrollable */}
-    <div className="flex-1 overflow-y-auto">
-      {renderItems(navItems)}
-    </div>
-
-    {/* Botón salir fijo abajo */}
-    <div className="border-t border-white/10 pt-4 mt-4">
-      <button
-        onClick={handleLogout}
+      <div
         className={clsx(
-          "w-full text-left py-2 rounded flex items-center transition-colors",
-          collapsed ? "justify-center px-2" : "gap-2 px-4",
-          "bg-secondary-500 hover:bg-secondary-600"
+          "bg-primary-600 text-white p-6 flex flex-col h-screen transition-all duration-300 z-50",
+          collapsed ? "w-20 md:w-20" : "w-72 md:w-72",
+          "md:relative md:block",
+          isMobileOpen ? "fixed top-0 left-0" : "hidden md:block"
         )}
       >
-        <LogOut className="w-4 h-4" />
-        {!collapsed && 'Salir'}
-      </button>
-    </div>
-  </div>
-);
+        <div className="mb-4">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="mb-4 text-white hover:text-gray-300"
+          >
+            {collapsed ? <FolderOpen className="w-5 h-5" /> : <FolderClosed className="w-5 h-5" />}
+          </button>
+          {!collapsed && <h1 className="text-2xl font-bold mb-6">{title}</h1>}
+        </div>
 
+        <div className="flex-1 overflow-y-auto">
+          {renderItems(navItems)}
+        </div>
+
+        <div className="border-t border-white/10 pt-4 mt-4">
+          <button
+            onClick={handleLogout}
+            className={clsx(
+              "w-full text-left py-2 rounded flex items-center transition-colors",
+              collapsed ? "justify-center px-2" : "gap-2 px-4",
+              "bg-secondary-500 hover:bg-secondary-600"
+            )}
+          >
+            <LogOut className="w-4 h-4" />
+            {!collapsed && 'Salir'}
+          </button>
+        </div>
+      </div>
+    </>
+  );
 }

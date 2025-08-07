@@ -37,7 +37,7 @@ export default function HistorialSection() {
   }, []);
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 space-y-8">
       <h2 className="text-2xl font-bold mb-6">Historial de Reportes</h2>
 
       {loading ? (
@@ -49,7 +49,8 @@ export default function HistorialSection() {
 
             {reportes[seccion]?.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-left border">
+                {/* Tabla en desktop */}
+                <table className="min-w-full text-sm text-left border hidden md:table">
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="px-4 py-2 border-b">Nombre</th>
@@ -59,14 +60,12 @@ export default function HistorialSection() {
                   </thead>
                   <tbody>
                     {reportes[seccion].map((file, idx) => {
-                     const match = file.match(/(\d{13})/);
-                     const fecha = match ? new Date(parseInt(match[1], 10)) : null;
+                      const match = file.match(/(\d{13})/);
+                      const fecha = match ? new Date(parseInt(match[1], 10)) : null;
 
                       const fechaFormateada = fecha
                         ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')} ${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}:${String(fecha.getSeconds()).padStart(2, '0')}`
                         : "N/A";
-
-
 
                       return (
                         <tr key={idx} className="border-t">
@@ -87,6 +86,35 @@ export default function HistorialSection() {
                     })}
                   </tbody>
                 </table>
+
+                {/* Vista mobile */}
+                <div className="md:hidden space-y-4">
+                  {reportes[seccion].map((file, idx) => {
+                    const match = file.match(/(\d{13})/);
+                    const fecha = match ? new Date(parseInt(match[1], 10)) : null;
+
+                    const fechaFormateada = fecha
+                      ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')} ${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}`
+                      : "N/A";
+
+                    return (
+                      <div
+                        key={idx}
+                        className="p-3 border rounded-md shadow-sm bg-gray-50 flex flex-col gap-1"
+                      >
+                        <div className="text-xs text-gray-500">{fechaFormateada}</div>
+                        <div className="font-medium break-all text-sm">{file}</div>
+                        <a
+                          href={`/reportes/${seccion}/${file}`}
+                          download
+                          className="text-sm text-green-600 hover:text-green-800 mt-1 w-fit"
+                        >
+                          <FileSpreadsheet className="w-4 h-4 inline mr-1" /> Descargar
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               <p className="text-gray-500 text-sm">No hay reportes generados.</p>
