@@ -54,11 +54,13 @@ export default function ContentWrapper({ children, title }: Props) {
         </div>
       )}
 
+      {/* Main content area */}
       <div className="p-6 md:p-8">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 ring-1 ring-gray-100 p-6 space-y-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 ring-1 ring-gray-100 p-6 space-y-4 overflow-hidden">
           {children}
         </div>
       </div>
+
     </div>
   );
 }

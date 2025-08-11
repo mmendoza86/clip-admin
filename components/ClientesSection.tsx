@@ -128,7 +128,8 @@ export default function ClientesSection() {
 
   return (
     <div>
-      <h2 ref={formRef} className="text-2xl font-bold mb-4">Gestión de Clientes</h2>
+      <div className="bg-white rounded-2xl shadow-xl space-y-4 overflow-hidden">
+          <h2 ref={formRef} className="text-2xl font-bold mb-4">Gestión de Clientes</h2>
 
       <ModalConfirm
         isOpen={showDeleteModal}
@@ -139,8 +140,8 @@ export default function ClientesSection() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <input className="border px-2 py-1" placeholder="Nombre" value={nuevo.nombre} onChange={e => setNuevo({ ...nuevo, nombre: e.target.value })} />
         <input className="border px-2 py-1" placeholder="No. Cliente" value={nuevo.numeroCte} onChange={e => setNuevo({ ...nuevo, numeroCte: e.target.value })} />
+        <input className="border px-2 py-1" placeholder="Nombre" value={nuevo.nombre} onChange={e => setNuevo({ ...nuevo, nombre: e.target.value })} />
         <input className="border px-2 py-1" placeholder="Correo" value={nuevo.correo} onChange={e => setNuevo({ ...nuevo, correo: e.target.value })} />
         <input className="border px-2 py-1" placeholder="Password" value={nuevo.password} onChange={e => setNuevo({ ...nuevo, password: e.target.value })} />
         <input className="border px-2 py-1" placeholder="API Key" value={nuevo.apiKey} onChange={e => setNuevo({ ...nuevo, apiKey: e.target.value })} />
@@ -165,8 +166,8 @@ export default function ClientesSection() {
           <div className="block md:hidden">
             {paginatedClientes.map(c => (
               <div key={c.id} className="border rounded p-4 mb-2 shadow-sm text-sm">
-                <p><strong>Nombre:</strong> {c.nombre}</p>
                 <p><strong>No. Cliente:</strong> {c.numeroCte}</p>
+                <p><strong>Nombre:</strong> {c.nombre}</p>
                 <p><strong>Correo:</strong> {c.correo}</p>
                 <p><strong>Password:</strong> ******</p>
                 <p><strong>API Key:</strong> ******</p>
@@ -183,41 +184,68 @@ export default function ClientesSection() {
             ))}
           </div>
 
-          <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full text-left border border-secondary-300 text-sm">
-              <thead className="bg-secondary-300">
-                <tr>
-                  <th className="p-2">Nombre</th>
-                  <th className="p-2">No. Cliente</th>
-                  <th className="p-2">Correo</th>
-                  <th className="p-2">Password</th>
-                  <th className="p-2">API Key</th>
-                  <th className="p-2">Clave Secreta</th>
-                  <th className="p-2">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedClientes.map(c => (
-                  <tr key={c.id} className="border-t">
-                    <td className="p-2">{c.nombre}</td>
-                    <td className="p-2">{c.numeroCte}</td>
-                    <td className="p-2">{c.correo}</td>
-                    <td className="p-2"><input type="password" readOnly value="123123" className="bg-transparent" /></td>
-                    <td className="p-2"><input type="password" readOnly value="123123" className="bg-transparent" /></td>
-                    <td className="p-2"><input type="password" readOnly value="123123" className="bg-transparent" /></td>
-                    <td className="p-2 space-x-2">
+                {/* Desktop / Scroll horizontal controlado */}
+          <div className="w-full max-w-full overflow-x-auto overscroll-x-contain">
+          <table className="table-fixed w-full text-left border border-secondary-300 text-sm">
+            {/* Ajusta proporciones a tu gusto */}
+            <colgroup>
+              <col className="w-[12%]" /> {/* No. Cliente */}
+              <col className="w-[18%]" /> {/* Nombre */}
+              <col className="w-[24%]" /> {/* Correo */}
+              <col className="w-[10%]"  /> {/* Acciones */}
+            </colgroup>
+
+            <thead className="bg-secondary-300">
+              <tr className="whitespace-nowrap">
+                <th className="p-2">No. Cliente</th>
+                <th className="p-2">Nombre</th>
+                <th className="p-2">Correo</th>
+                <th className="p-2">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody className="align-top">
+              {paginatedClientes.map((c) => (
+                <tr key={c.id} className="border-t">
+                  {/* Texto truncado en 1 línea con tooltip */}
+                  <td className="p-2 truncate min-w-0" title={c.numeroCte}>{c.numeroCte}</td>
+                  <td className="p-2 truncate min-w-0" title={c.nombre}>{c.nombre}</td>
+                  <td className="p-2 truncate min-w-0" title={c.correo}>{c.correo}</td>
+
+                  {/* Inputs: contenedor con min-w-0 y el input con w-full para que no empuje la celda
+                  <td className="p-2">
+                    <div className="min-w-0 overflow-hidden">
+                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                    </div>
+                  </td>
+                  <td className="p-2">
+                    <div className="min-w-0 overflow-hidden">
+                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                    </div>
+                  </td>
+                  <td className="p-2">
+                    <div className="min-w-0 overflow-hidden">
+                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                    </div>
+                  </td>
+                   */}
+
+                  <td className="p-2">
+                    <div className="flex items-center gap-2">
                       <button onClick={() => editar(c)} className="text-blue-600 hover:underline">
                         <Edit className="inline w-4 h-4" />
                       </button>
                       <button onClick={() => abrirModalEliminar(c.id)} className="text-red-600 hover:underline">
                         <Trash2 className="inline w-4 h-4" />
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         </>
       )}
 
@@ -232,6 +260,7 @@ export default function ClientesSection() {
           </button>
         </div>
       )}
-    </div>
+     </div>
+</div>
   );
 }
