@@ -184,67 +184,67 @@ export default function ClientesSection() {
             ))}
           </div>
 
-                {/* Desktop / Scroll horizontal controlado */}
-          <div className="w-full max-w-full overflow-x-auto overscroll-x-contain">
-          <table className="table-fixed w-full text-left border border-secondary-300 text-sm">
-            {/* Ajusta proporciones a tu gusto */}
-            <colgroup>
-              <col className="w-[12%]" /> {/* No. Cliente */}
-              <col className="w-[18%]" /> {/* Nombre */}
-              <col className="w-[24%]" /> {/* Correo */}
-              <col className="w-[10%]"  /> {/* Acciones */}
-            </colgroup>
+          {/* Desktop / Scroll horizontal controlado */}
+          <div className="w-full max-w-full overflow-x-auto overscroll-x-contain md:block hidden">
+            <table className="table-fixed w-full text-left border border-secondary-300 text-sm">
+              {/* Ajusta proporciones a tu gusto */}
+              <colgroup>
+                <col className="w-[12%]" /> {/* No. Cliente */}
+                <col className="w-[18%]" /> {/* Nombre */}
+                <col className="w-[24%]" /> {/* Correo */}
+                <col className="w-[10%]"  /> {/* Acciones */}
+              </colgroup>
 
-            <thead className="bg-secondary-300">
-              <tr className="whitespace-nowrap">
-                <th className="p-2">No. Cliente</th>
-                <th className="p-2">Nombre</th>
-                <th className="p-2">Correo</th>
-                <th className="p-2">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody className="align-top">
-              {paginatedClientes.map((c) => (
-                <tr key={c.id} className="border-t">
-                  {/* Texto truncado en 1 línea con tooltip */}
-                  <td className="p-2 truncate min-w-0" title={c.numeroCte}>{c.numeroCte}</td>
-                  <td className="p-2 truncate min-w-0" title={c.nombre}>{c.nombre}</td>
-                  <td className="p-2 truncate min-w-0" title={c.correo}>{c.correo}</td>
-
-                  {/* Inputs: contenedor con min-w-0 y el input con w-full para que no empuje la celda
-                  <td className="p-2">
-                    <div className="min-w-0 overflow-hidden">
-                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <div className="min-w-0 overflow-hidden">
-                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <div className="min-w-0 overflow-hidden">
-                      <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
-                    </div>
-                  </td>
-                   */}
-
-                  <td className="p-2">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => editar(c)} className="text-blue-600 hover:underline">
-                        <Edit className="inline w-4 h-4" />
-                      </button>
-                      <button onClick={() => abrirModalEliminar(c.id)} className="text-red-600 hover:underline">
-                        <Trash2 className="inline w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+              <thead className="bg-secondary-300">
+                <tr className="whitespace-nowrap">
+                  <th className="p-2">No. Cliente</th>
+                  <th className="p-2">Nombre</th>
+                  <th className="p-2">Correo</th>
+                  <th className="p-2">Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+
+              <tbody className="align-top">
+                {paginatedClientes.map((c) => (
+                  <tr key={c.id} className="border-t">
+                    {/* Texto truncado en 1 línea con tooltip */}
+                    <td className="p-2 truncate min-w-0" title={c.numeroCte}>{c.numeroCte}</td>
+                    <td className="p-2 truncate min-w-0" title={c.nombre}>{c.nombre}</td>
+                    <td className="p-2 truncate min-w-0" title={c.correo}>{c.correo}</td>
+
+                    {/* Inputs: contenedor con min-w-0 y el input con w-full para que no empuje la celda
+                    <td className="p-2">
+                      <div className="min-w-0 overflow-hidden">
+                        <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                      </div>
+                    </td>
+                    <td className="p-2">
+                      <div className="min-w-0 overflow-hidden">
+                        <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                      </div>
+                    </td>
+                    <td className="p-2">
+                      <div className="min-w-0 overflow-hidden">
+                        <input type="password" readOnly value="123123" className="bg-transparent w-full min-w-0" />
+                      </div>
+                    </td>
+                    */}
+
+                    <td className="p-2">
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => editar(c)} className="text-blue-600 hover:underline">
+                          <Edit className="inline w-4 h-4" />
+                        </button>
+                        <button onClick={() => abrirModalEliminar(c.id)} className="text-red-600 hover:underline">
+                          <Trash2 className="inline w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
         </>
       )}
