@@ -61,14 +61,24 @@ export default function ConciliacionTable({ data, itemsPerPage = 10 }: Props) {
           type="text"
           placeholder="Filtrar por Transacción"
           value={filtroTransaccion}
-          onChange={(e) => setFiltroTransaccion(e.target.value)}
+          onChange={
+            (e) => {
+              setFiltroTransaccion(e.target.value);
+              setCurrentPage(1);
+            }
+          }
           className="px-3 py-1 border rounded"
         />
         <input
           type="text"
           placeholder="Filtrar por Cuenta"
           value={filtroCuenta}
-          onChange={(e) => setFiltroCuenta(e.target.value)}
+          onChange={
+            (e) => {
+              setFiltroCuenta(e.target.value);
+              setCurrentPage(1);
+            }
+          }
           className="px-3 py-1 border rounded"
         />
 

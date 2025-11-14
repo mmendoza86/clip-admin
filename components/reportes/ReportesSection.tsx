@@ -80,7 +80,7 @@ export default function ReporteSeccion({ seccion, fetchData }: ReporteSeccionPro
 
     try {
       const res = await fetchData(startDate, endDate, clienteId);
-      const data = seccion === 'depositos' ? res.data.settlements : res.data;
+      const data = res.data;
       const transformer = getExportModel(seccion);
       const exportData = transformer(data);
 

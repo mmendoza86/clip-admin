@@ -1,18 +1,26 @@
 // types/exportTypes.ts
 
 export interface DepositoExport {
-  id: number;
-  settlement_report_id: string;
-  disbursement_date: string; // Similar a paymentDate, puede ser Date
-  gross_amount: number;
-  totalFee: number;
-  totalTax: number;
-  totalRetention: number;
-  disbursedNetAmount: number;
-  totalTransactions: number;
-  linkHref: string;
-  payments: Payment[];
-}
+  TransaccionId: string;
+  Recibo: string;
+  ReciboDeposito: string;
+  FechaTransaccion: string;
+  FechaDeposito: string;
+  Referencia: string;
+  Monto: number;
+  Propina: number;
+  MSI: string | null;
+  Plazo: number;
+  PorcentajeDeComision: number;
+  ComisionEnPesos: number;
+  IVA: number;
+  RetencionTotal: number;
+  MontoNeto: number;
+  NombreDeLaCuenta: string;
+  UsuarioDeposito: string;
+  UsuarioTransaccion: string;
+};
+
 
 interface Payment {
   id: number;

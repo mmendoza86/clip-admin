@@ -2,27 +2,66 @@ import { DepositoExport, PagoExport } from '../types/exportTypes';
 
 type ExportTransformer = (data: any[]) => any[];
 
-const exportModels: Record<string, ExportTransformer> = {
-  depositos: (data): DepositoExport[] =>
-    data.map(t => ({
-      id: t.id,
-      settlement_report_id: t.settlement_report_id,
-      disbursement_date: t.disbursement_date,
-      gross_amount: t.gross_amount,
-      totalFee: t.totalFee,
-      totalTax: t.totalTax,
-      totalRetention: t.totalRetention,
-      disbursedNetAmount: t.disbursedNetAmount,
-      totalTransactions: t.totalTransactions,
-      linkHref: t.linkHref,
-      payments: t.payments
-    })), 
+type DepositoApi = {
+  transactionId: string;
+  setflow: string;
+  fechaTransaccion: string;
+  fechaDeposito: string;
+  recibo: string;
+  reciboDeposito: string;
+  referencia: string;
+  monto: number;
+  propina: number;
+  msi: string | null;
+  plazo: number;
+  porcentaje_De_Comision: number;
+  comision_En_Pesos: number;
+  iva: number;
+  retencion_Total: number;
+  monto_Neto: number;
+  nombre_De_La_Cuenta: string;
+  usuarioDeposito: string;
+  usuarioTransaccion: string;
+};
 
-  transacciones: (data): PagoExport[] =>
-    data.map(p => ({
+
+const exportModels: Record<string, ExportTransformer> = {
+  depositos: (data: any[]): DepositoExport[] => {
+    const depositos = data as DepositoApi[];
+
+    return depositos.map(d => ({
+      TransaccionId: d.transactionId,
+      Recibo: d.recibo,
+      ReciboDeposito: d.reciboDeposito,
+      FechaTransaccion: new Date(d.fechaTransaccion)
+        .toISOString()
+        .replace('T', ' ')
+        .slice(0, 19),
+      FechaDeposito: new Date(d.fechaDeposito)
+        .toISOString()
+        .replace('T', ' ')
+        .slice(0, 19),
+      Referencia: d.referencia,
+      Monto: d.monto,
+      Propina: d.propina,
+      MSI: d.msi,
+      Plazo: d.plazo,
+      PorcentajeDeComision: d.porcentaje_De_Comision,
+      ComisionEnPesos: d.comision_En_Pesos,
+      IVA: d.iva,
+      RetencionTotal: d.retencion_Total,
+      MontoNeto: d.monto_Neto,
+      NombreDeLaCuenta: d.nombre_De_La_Cuenta,
+      UsuarioDeposito: d.usuarioDeposito,
+      UsuarioTransaccion: d.usuarioTransaccion
+    }));
+  },
+
+  transacciones: (data: any[]): PagoExport[] =>
+    data.map((p: any) => ({
       ID: p.id,
       Recibo: p.receiptNo,
-      Fecha: new Date(p.createdAt).toISOString().split("T").join(" ").slice(0, 19),
+      Fecha: new Date(p.createdAt).toISOString().split('T').join(' ').slice(0, 19),
       Correo: p.userEmail,
       Estado: p.status,
       Método: p.paymentMethod,
@@ -36,6 +75,8 @@ const exportModels: Record<string, ExportTransformer> = {
       Total: p.total
     }))
 };
+
+
 
 export function getExportModel(seccion: string): ExportTransformer {
   return exportModels[seccion] || ((data) => data);
